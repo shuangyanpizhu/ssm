@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html lang="en">
 
 <head>
@@ -18,7 +19,40 @@
     <link rel="stylesheet" href="assets/css/amazeui.datatables.min.css" />
     <link rel="stylesheet" href="assets/css/app.css">
     <script src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        function getNextClassify()
+        {
+            var param=$("#categoryLevel1Id").serializeArray();
+            $("#categoryLevel2Id").empty();     //清空二级目录
+            var categoryLevel2Id=$("#categoryLevel2Id");
+            $.post("selectByIdName.json",param,function(data){
+                var html1="";
 
+                for ( var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    categoryLevel2Id.append("<option value="+obj.id+">"+obj.name+"</option>");
+                }
+                //$("#xs1").html(html1);
+            },"json")
+
+        }
+
+        function getNextClassifys() {
+
+            var param = $("#categoryLevel2Id").serializeArray();
+            $("#categoryLevel3Id").empty();     //清空二级目录
+            var categoryLevel3Id = $("#categoryLevel3Id");
+            $.post("selectByIdsName.json", param, function (data) {
+                var html1 = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    categoryLevel3Id.append("<option value=" + obj.id + ">" + obj.name + "</option>");
+                }
+                //$("#xs1").html(html1);
+            }, "json")
+        }
+    </script>
 </head>
 
 <body data-type="widgets">
@@ -214,7 +248,7 @@
                 <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
                     <div class="widget am-cf">
                         <div class="widget-head am-cf">
-                            <div class="widget-title am-fl">添加商品</div>
+                            <div class="widget-title am-fl">修改商品</div>
                             <div class="widget-function am-fr">
                                 <a href="javascript:;" class="am-icon-cog"></a>
                             </div>
@@ -225,24 +259,25 @@
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品名称：<span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                        <input  name="name" type="text" class="tpl-form-input" id="user-name" placeholder="请输入商品名称">
+                                        <input  name="name" type="text" class="tpl-form-input" id="user-name" placeholder="请输入商品名称" value="${product.name}">
                                     </div>
                                 </div>
 
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品价格： <span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                        <input name="price" type="text" class="am-form-field tpl-form-no-bg" placeholder="请输入商品价格">
+                                        <input name="price" type="text" class="am-form-field tpl-form-no-bg" placeholder="请输入商品价格" value="${product.price}">
                                     </div>
                                 </div>
 
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品一级分类 <span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                        <select data-am-selected="{searchBox: 1}" style="display: none;">
-                                            <option value="a">-The.CC</option>
-                                            <option value="b">夕风色</option>
-                                            <option value="o">Orange</option>
+                                        <select onChange="getNextClassify()" name="categoryLevel1Id" id="categoryLevel1Id" data-am-selected="{searchBox: 1}" style="display: none;">
+                                            <option value="">---请选择---</option>
+                                            <c:forEach items="${list}" var="l">
+                                                <option value="${l.id}">${l.name}</option>
+                                            </c:forEach>
                                         </select>
 
                                     </div>
@@ -251,10 +286,8 @@
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品二级分类 <span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                        <select data-am-selected="{searchBox: 1}" style="display: none;">
-                                            <option value="a">-The.CC</option>
-                                            <option value="b">夕风色</option>
-                                            <option value="o">Orange</option>
+                                        <select onChange="getNextClassifys()" name="categoryLevel2Id" id="categoryLevel2Id" data-am-selected="{searchBox: 1}" style="display: none;">
+                                            <option value="">---请选择---</option>
                                         </select>
 
                                     </div>
@@ -263,10 +296,8 @@
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品三级分类 <span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                        <select data-am-selected="{searchBox: 1}" style="display: none;">
-                                            <option value="a">-The.CC</option>
-                                            <option value="b">夕风色</option>
-                                            <option value="o">Orange</option>
+                                        <select name="categoryLevel3Id" id="categoryLevel3Id" data-am-selected="{searchBox: 1}" style="display: none;">
+                                            <option value="">---请选择---</option>
                                         </select>
 
                                     </div>
@@ -275,12 +306,12 @@
                                 <div class="am-form-group">
                                     <label class="am-u-sm-3 am-form-label">商品描述<span class="tpl-form-line-small-title"></span></label>
                                     <div class="am-u-sm-9">
-                                       <textarea name="description"></textarea>
+                                       <textarea name="description">${product.description}</textarea>
                                     </div>
                                 </div>
 
                                 <div class="am-form-group">
-                                    <label class="am-u-sm-3 am-form-label"><span class="tpl-form-line-small-title">上传商品图片</span></label>
+                                    <label class="am-u-sm-3 am-form-label"><span class="tpl-form-line-small-title">商品图片</span></label>
                                     <div class="am-u-sm-9">
                                         <div class="am-form-group am-form-file">
                                             <div class="tpl-form-file-img">
@@ -296,8 +327,8 @@
 
                                 <div class="am-form-group">
                                     <div class="am-u-sm-9 am-u-sm-push-3">
-                                        <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交</button>
-                                        <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">清空</button>
+                                        <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">修改</button>
+                                        <button type="reset" class="am-btn am-btn-primary tpl-btn-bg-color-success ">重置</button>
                                     </div>
                                 </div>
                             </form>

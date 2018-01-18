@@ -1,4 +1,4 @@
-package com.store.utils;
+package cn.bdqn.common;
 
 
 
@@ -35,7 +35,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
  */
 public class MyHttpUtils
 {
-    public static CloseableHttpClient createHttpClient()
+    public static CloseableHttpClient  createHttpClient()
     {
         CloseableHttpClient closeableHttpClient = null;
         try {

@@ -7,7 +7,7 @@ public class Product {
     private int id;
     private String name;
     private String description;
-    private Double pirce;
+    private Double price;
     private int categoryLevel1Id;
     private int categoryLevel2Id;
     private int categoryLevel3Id;
@@ -37,12 +37,12 @@ public class Product {
         this.description = description;
     }
 
-    public Double getPirce() {
-        return pirce;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setPirce(Double pirce) {
-        this.pirce = pirce;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public int getCategoryLevel1Id() {

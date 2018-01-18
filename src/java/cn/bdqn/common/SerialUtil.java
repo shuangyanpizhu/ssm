@@ -1,4 +1,4 @@
-package com.store.utils;
+package cn.bdqn.common;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -3,5 +3,45 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.bdqn.dao.ProductMapper">
+    <sql id="select">
+        <trim prefix="where" suffixOverrides="and">
+            <if test="name!=null and name!=''">name LIKE CONCAT ('%',#{name},'%') and</if>
+            <if test="categoryLevel1Id!=null and categoryLevel1Id!=''">categoryLevel1Id=#{categoryLevel1Id} and</if>
+            <if test="categoryLevel2Id!=null and categoryLevel2Id!=''">categoryLevel2Id=#{categoryLevel2Id} and</if>
+            <if test="categoryLevel3Id!=null and categoryLevel3Id!=''">categoryLevel3Id=#{categoryLevel3Id} and</if>
+        </trim>
+    </sql>
 
+    <select id="selectAll" resultType="cn.bdqn.entity.Product">
+        select * from product
+        <include refid="select"/>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="selectCount" resultType="int">
+        select count(*) from product
+        <include refid="select"/>
+    </select>
+
+    <select id="selectAllFd" resultType="cn.bdqn.entity.Product">
+        select * from product
+    </select>
+
+    <delete id="deleteById" >
+        DELETE FROM product where id=#{id}
+    </delete>
+
+    <insert id="addProduct" >
+        insert into product(name,description,price,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,fileName) VALUES
+        (#{name},#{description},#{price},#{categoryLevel1Id},#{categoryLevel2Id},#{categoryLevel3Id},#{fileName})
+    </insert>
+
+    <update id="updateById">
+        update product SET name=#{name},description=#{description},price=#{price},categoryLevel1Id=#{categoryLevel1Id},categoryLevel2Id=#{categoryLevel2Id},
+        categoryLevel3Id=#{fileName},fileName where id=#{id}
+    </update>
+
+    <select id="selectById" resultType="cn.bdqn.entity.Product">
+        select * from product where id=#{id}
+    </select>
 </mapper>

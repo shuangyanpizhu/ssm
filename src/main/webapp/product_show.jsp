@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,7 +20,101 @@
     <link rel="stylesheet" href="assets/css/amazeui.datatables.min.css" />
     <link rel="stylesheet" href="assets/css/app.css">
     <script src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript">
+            function search()
+            {
+                $("#pageNo").val(1);
+                dosearch();
+            }
+            var pageCount=1;
+            function dosearch()
+            {
+                var param=$("#myForm").serializeArray();
+                $.post("selectProduct.json",param,function(data){
+                    var html="";
+                    pageCount=data.pageCount;
+                    for(var i=0;i<data.list.length;i++)
+                    {
+                        var obj=data.list[i];
+                        html+="<tr class=\"gradeX\">"
+                            +"<td>"+obj.id+"</td>"
+                            +"<td> "+obj.name+"</td>"
+                            +"<td> "+obj.price+"</td>"
+                            +"<td>"+obj.description+"</td>"
+                            +"<td> "+obj.fileName+"</td>"
+                            +"<td><div class=\"tpl-table-black-operation\"><a href=\"selectById?id="+obj.id+"\"><i class=\"am-icon-pencil\"></i> 编辑 </a> <a href=\"javascript:del("+obj.id+")\" class=\"tpl-table-black-operation-del\"><i class=\"am-icon-trash\"></i> 删除 </a></div></td>"
+                            +"</tr>";
+                    }
+                    $("#xs").html(html);
+                },"json")
+            }
 
+            function del(id)
+            {
+                $.post("del",{"id":id},function(data){
+                },"json");
+                dosearch();
+            }
+
+           function changePagePreOrNext(eat)
+           {
+               var pageNo=$("#pageNo").val();
+               pageNo=parseInt(pageNo);
+               pageNo=pageNo+eat;
+               if(pageNo<1)
+               {
+                   pageNo=1;
+               }
+
+               if(eat!=-1 && pageNo>pageCount)
+               {
+                   return;
+               }
+
+               $("#pageNo").val(pageNo);
+
+               dosearch();
+           }
+
+        function changePage(pageNo)
+        {
+            var pageNo=$("#pageNo").val(pageNo);
+            dosearch();
+        }
+
+        function getNextClassify()
+        {
+            var param=$("#categoryLevel1Id").serializeArray();
+            $("#categoryLevel2Id").empty();     //清空二级目录
+            var categoryLevel2Id=$("#categoryLevel2Id");
+            $.post("selectByIdName.json",param,function(data){
+                    var html1="";
+
+                    for ( var i = 0; i < data.length; i++) {
+                        var obj=data[i];
+                        categoryLevel2Id.append("<option value="+obj.id+">"+obj.name+"</option>");
+                    }
+               //$("#xs1").html(html1);
+            },"json")
+
+        }
+
+            function getNextClassifys() {
+
+                var param = $("#categoryLevel2Id").serializeArray();
+                $("#categoryLevel3Id").empty();     //清空二级目录
+                var categoryLevel3Id = $("#categoryLevel3Id");
+                $.post("selectByIdsName.json", param, function (data) {
+                    var html1 = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        categoryLevel3Id.append("<option value=" + obj.id + ">" + obj.name + "</option>");
+                    }
+                    //$("#xs1").html(html1);
+                }, "json")
+            }
+    </script>
 </head>
 
 <body data-type="widgets">
@@ -216,19 +311,38 @@
 
 
                         </div>
+                        <form id="myForm" method="post">
                         <div class="widget-body  am-fr">
 
 
                             <div class="am-u-sm-12 am-u-md-6 am-u-lg-3">
                                 <div class="am-form-group tpl-table-list-select">
-                                    <select data-am-selected="{btnSize: 'sm'}">
-                                        <option value="option1">商品类型</option>
-                                        <option value="option2">IT业界</option>
-                                        <option value="option3">数码产品</option>
-                                        <option value="option3">笔记本电脑</option>
-                                        <option value="option3">平板电脑</option>
-                                        <option value="option3">只能手机</option>
-                                        <option value="option3">超极本</option>
+                                    一级分类
+                                    <select onChange="getNextClassify()" name="categoryLevel1Id" id="categoryLevel1Id" data-am-selected="{btnSize: 'sm'}">
+                                        <option value="">---请选择---</option>
+                                        <c:forEach items="${list}" var="l">
+                                        <option value="${l.id}">${l.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="am-u-sm-12 am-u-md-6 am-u-lg-3">
+                                <div class="am-form-group tpl-table-list-select">
+                                    二级分类
+                                    <select onChange="getNextClassifys()" name="categoryLevel2Id" id="categoryLevel2Id" data-am-selected="{btnSize: 'sm'}">
+                                        <option value="">---请选择---</option>
+                                        <!--<tbody id="xs1"></tbody>-->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="am-u-sm-12 am-u-md-6 am-u-lg-3">
+                                <div class="am-form-group tpl-table-list-select">
+                                    三级分类
+                                    <select name="categoryLevel3Id" id="categoryLevel3Id" data-am-selected="{btnSize: 'sm'}">
+                                        <option value="">---请选择---</option>
+
                                     </select>
                                 </div>
                             </div>
@@ -236,43 +350,32 @@
 
                             <div class="am-u-sm-12 am-u-md-12 am-u-lg-3">
                                 <div class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
-                                    <input type="text" class="am-form-field ">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="text" class="am-form-field " name="name" placeholder="请输入商品名">
+                                    <input type="hidden" id="pageNo" name="pageNo" value="1">
                                     <span class="am-input-group-btn">
-            <button class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-search" type="button"></button>
+                                    <button style="margin-top: 25px;" class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-search" type="button" onclick="search()"></button>
           </span>
                                 </div>
                             </div>
+                        </form>
 
                             <div class="am-u-sm-12">
                                 <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black " id="example-r">
                                     <thead>
                                     <tr>
                                         <th>订单号</th>
-                                        <th>下单时间</th>
-                                        <th>下单门店编号</th>
-                                        <th>发货地址</th>
-                                        <th>订单状态</th>
+                                        <th>商品名称</th>
+                                        <th>商品价格</th>
+                                        <th>商品描述</th>
+                                        <th>图片路径</th>
                                         <th>操作</th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <tr class="gradeX">
-                                        <td> Amaze UI 模式窗口</td>
-                                        <td> 张鹏飞</td>
-                                        <td> 2016-09-26</td>
-                                        <td>
-                                             洛阳西工
-                                        </td>
-                                        <td> 张鹏飞</td>
-                                        <td><div class="tpl-table-black-operation">
-                                            <a href="javascript:;">
-                                                <i class="am-icon-pencil"></i> 编辑
-                                            </a>
-                                            <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                <i class="am-icon-trash"></i> 删除
-                                            </a>
-                                        </div></td>
-                                    </tr>
+                                    <tbody id="xs">
+
                                     <!-- more data -->
                                     </tbody>
                                 </table>
@@ -281,13 +384,13 @@
 
                                 <div class="am-fr">
                                     <ul class="am-pagination tpl-pagination">
-                                        <li class="am-disabled"><a href="#">«</a></li>
-                                        <li class="am-active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li><a href="#">»</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePagePreOrNext(-1);">«</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePage(1);">1</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePage(2);">2</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePage(3);">3</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePage(4);">4</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePage(5);">5</a></li>
+                                        <li><a href="javascrpit:;" onclick="changePagePreOrNext(1);">»</a></li>
                                     </ul>
                                 </div>
                             </div>

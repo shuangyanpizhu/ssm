@@ -1,4 +1,4 @@
-package com.store.utils;
+package cn.bdqn.common;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
