@@ -33,18 +33,17 @@ public class ProductController {
     private ProductService productService;
     @Autowired
     private ProductCategoryService productCategoryService;
+
     @ResponseBody
     @RequestMapping("/selectProduct.json")
-    public PageUtils<Product> selectProduct(String name,Integer categoryLevel1Id,Integer categoryLevel2Id,Integer categoryLevel3Id,Integer pageNo)
-    {
-        return productService.select(name,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,4,pageNo);
+    public PageUtils<Product> selectProduct(String name, Integer categoryLevel1Id, Integer categoryLevel2Id, Integer categoryLevel3Id, Integer pageNo) {
+        return productService.select(name, categoryLevel1Id, categoryLevel2Id, categoryLevel3Id, 4, pageNo);
     }
 
     @ResponseBody
     @RequestMapping("/selectAllFd")
-    public List<Product>  selectAllFd()
-    {
-        List<Product> list=productService.selectAllFd();
+    public List<Product> selectAllFd() {
+        List<Product> list = productService.selectAllFd();
         return list;
 //        String json= JSON.toJSONString(list);
 //        return json;
@@ -52,22 +51,19 @@ public class ProductController {
 
     @ResponseBody
     @RequestMapping("/del")
-    public void delete(Integer id)
-    {
-        int a=productService.deleteById(id);
+    public void delete(Integer id) {
+        int a = productService.deleteById(id);
     }
 
     @RequestMapping("/add")
     public String add(String name, String description, Double price, Integer categoryLevel1Id,
-                      Integer categoryLevel2Id, Integer categoryLevel3Id, @RequestParam("upload")MultipartFile [] files,HttpServletRequest request)
-    {
-        String upLoadPath=request.getSession().getServletContext().getRealPath("upload");
-        String fileName="";
-        for (int i=0;i<files.length;i++)
-        {
-            MultipartFile multipartFile=files[i];
-            fileName=multipartFile.getOriginalFilename();
-            File file=new java.io.File(upLoadPath,fileName);
+                      Integer categoryLevel2Id, Integer categoryLevel3Id, @RequestParam("upload") MultipartFile[] files, HttpServletRequest request) {
+        String upLoadPath = request.getSession().getServletContext().getRealPath("upload");
+        String fileName = "";
+        for (int i = 0; i < files.length; i++) {
+            MultipartFile multipartFile = files[i];
+            fileName = multipartFile.getOriginalFilename();
+            File file = new java.io.File(upLoadPath, fileName);
 
             try {
                 multipartFile.transferTo(file);
@@ -76,21 +72,42 @@ public class ProductController {
             }
 
         }
-        int a=productService.addProduct(name,description,price,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,fileName);
+        int a = productService.addProduct(name, description, price, categoryLevel1Id, categoryLevel2Id, categoryLevel3Id, fileName);
+        if (a > 0) {
+            return "redirect:/selectByName";
+        } else {
+            return "redirect:/addHq.jsp";
+        }
+
+    }
+
+    @RequestMapping("/update")
+    public String update(Integer id, String name, String description, Double price, Integer categoryLevel1Id, Integer categoryLevel2Id,
+                         Integer categoryLevel3Id, String fileName, @RequestParam("upload") MultipartFile[] files, HttpServletRequest request) {
+        String upLoadPath = request.getSession().getServletContext().getRealPath("upload");
+        String fileName1 = "";
+        for (int i = 0; i < files.length; i++) {
+            MultipartFile multipartFile = files[i];
+            fileName = multipartFile.getOriginalFilename();
+            File file = new java.io.File(upLoadPath, fileName1);
+
+            try {
+                multipartFile.transferTo(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        int a = productService.updateById(id, name, description, price, categoryLevel1Id, categoryLevel2Id, categoryLevel3Id, fileName1);
         if(a>0)
         {
             return "redirect:/selectByName";
         }else
         {
-            return "redirect:/addHq.jsp";
+            return "redirect:/upHQ.jsp";
         }
+    }
 
-    }
-    @RequestMapping("/update")
-    public String update(Integer id,String name,String description, Double price,Integer categoryLevel1Id, Integer categoryLevel2Id,Integer categoryLevel3Id, String fileName)
-    {
-        return "";
-    }
 
     @RequestMapping("/selectById")
     public String selectById(Integer id,HttpSession session)

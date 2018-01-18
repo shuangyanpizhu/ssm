@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <update id="updateById">
         update product SET name=#{name},description=#{description},price=#{price},categoryLevel1Id=#{categoryLevel1Id},categoryLevel2Id=#{categoryLevel2Id},
-        categoryLevel3Id=#{fileName},fileName where id=#{id}
+        categoryLevel3Id=#{categoryLevel3Id},fileName=#{fileName} where id=#{id}
     </update>
 
     <select id="selectById" resultType="cn.bdqn.entity.Product">
