@@ -88,7 +88,7 @@ public class ProductController {
         String fileName1 = "";
         for (int i = 0; i < files.length; i++) {
             MultipartFile multipartFile = files[i];
-            fileName = multipartFile.getOriginalFilename();
+            fileName1 = multipartFile.getOriginalFilename();
             File file = new java.io.File(upLoadPath, fileName1);
 
             try {
